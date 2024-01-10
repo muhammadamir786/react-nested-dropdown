@@ -195,7 +195,7 @@ const Option = <TValue,>({
 
   const handleClick = React.useCallback(
     (e: UIEvent) => {
-      if (hasSubmenu) return;
+      // if (hasSubmenu) return;
 
       e.stopPropagation();
       onSelect(option);
@@ -242,17 +242,20 @@ const Option = <TValue,>({
       onKeyUp={handleClick}
     >
       {hasSubmenu && (
-        <ul
-          className={clsx(`rnd__menu rnd__submenu ${menuPositionClassName}`, {
-            'rnd__submenu--opened': submenuIsOpen,
-          })}
-          ref={submenuRef}
-          style={{ width: itemsContainerWidth }}
-        >
-          {items.map((item, index) => (
-            <Option key={index} option={item} onSelect={onSelect} renderOption={renderOption} />
-          ))}
-        </ul>
+          <ul
+            className={clsx(`rnd__menu rnd__submenu ${menuPositionClassName}`, {
+              'rnd__submenu--opened': submenuIsOpen,
+            })}
+            ref={submenuRef}
+            style={{ width: itemsContainerWidth }}
+          >
+            <div className='rnd-overlay-submenu'>
+            {items.map((item, index) => (
+              <Option key={index} option={item} onSelect={onSelect} renderOption={renderOption} />
+            ))}
+
+            </div>
+          </ul>
       )}
       {renderOption && renderOption(option)}
       {!renderOption && (

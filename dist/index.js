@@ -154,8 +154,6 @@ var Option = function (_a) {
     var _c = React.useState(''), menuPositionClassName = _c[0], setMenuPositionClassName = _c[1];
     var _d = React.useState(false), submenuIsOpen = _d[0], setSubmenuOpen = _d[1];
     var handleClick = React.useCallback(function (e) {
-        if (hasSubmenu)
-            return;
         e.stopPropagation();
         onSelect(option);
     }, [hasSubmenu, onSelect, option]);
@@ -187,7 +185,8 @@ var Option = function (_a) {
         }), onMouseDown: handleClick, onKeyUp: handleClick },
         hasSubmenu && (React.createElement("ul", { className: clsx("rnd__menu rnd__submenu ".concat(menuPositionClassName), {
                 'rnd__submenu--opened': submenuIsOpen,
-            }), ref: submenuRef, style: { width: itemsContainerWidth } }, items.map(function (item, index) { return (React.createElement(Option, { key: index, option: item, onSelect: onSelect, renderOption: renderOption })); }))),
+            }), ref: submenuRef, style: { width: itemsContainerWidth } },
+            React.createElement("div", { className: 'rnd-overlay-submenu' }, items.map(function (item, index) { return (React.createElement(Option, { key: index, option: item, onSelect: onSelect, renderOption: renderOption })); })))),
         renderOption && renderOption(option),
         !renderOption && (React.createElement(React.Fragment, null,
             option.iconBefore && (React.createElement("div", { className: "rnd__option-icon rnd__option-icon--left" }, option.iconBefore)),
