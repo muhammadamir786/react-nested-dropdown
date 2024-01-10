@@ -1,5 +1,5 @@
 .rnd {
-  position: relative;
+  position: absolute;
   width: fit-content;
 }
 
@@ -8,11 +8,16 @@
 }
 
 .rnd__root-menu {
-  position: absolute;
+  position: relative;
   top: 100%;
   right: 0;
-  margin: 7px 0;
+  margin: 0px;
   z-index: 10;
+}
+
+.rnd-overlay{
+  padding: 7px 0px;
+  margin: 0px;
 }
 
 .rnd__root-menu.rnd__menu--top {

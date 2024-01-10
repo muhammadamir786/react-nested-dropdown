@@ -30,7 +30,8 @@ export interface DropdownProps<TValue> {
   items: DropdownItem<TValue>[];
   containerWidth?: number | string;
   onSelect?: (value: TValue, option: DropdownItem<TValue>) => void;
-  children: (params: { onClick: () => void; isOpen: boolean }) => ReactElement;
+  onHover?: () => void;
+  children: (params: { onHover: () => void; onClick: () => void; isOpen: boolean }) => ReactElement;
   className?: string;
   renderOption?: (option: DropdownItem<TValue>) => ReactNode;
   closeOnScroll?: boolean;
@@ -40,22 +41,64 @@ export const Dropdown = <TValue,>({
   items,
   containerWidth = 300,
   onSelect,
+  onHover,
   children,
   className,
   renderOption,
   closeOnScroll = true,
 }: DropdownProps<TValue>): React.ReactElement => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const rootMenuRef = useRef<HTMLUListElement>(null);
   const [menuPositionClassName, setMenuPositionClassName] = useState<string>('');
   const [dropdownIsOpen, setDropdownOpen] = useState(false);
+  const [dropdownMainClose, setDropdownMainClose] = useState(false);
+  const [dropdownChildClose, setDropdownChildClose] = useState(false);
 
-  const toggleDropdown = useCallback(() => setDropdownOpen(state => !state), []);
-  const closeDropdown = useCallback(() => setDropdownOpen(false), []);
+  const handleMouseOver = () => {
+  };
+
+  const handleMouseOutMain = () => {
+    setDropdownMainClose(state => true);
+    if(!containerRef.current?.querySelector('ul')?.classList.contains('hovered')){
+      setDropdownChildClose(state => true);  
+    }
+  };
+
+  const handleMouseOutChild = () => {
+    setDropdownChildClose(state => true);
+  };
+
+  const handleMouseOverChild = () => {
+    containerRef.current?.querySelector('ul')?.classList.add('hovered');
+  };
+
+  const toggleDropdown = useCallback(() => {
+    if(!containerRef.current?.classList.contains('hovered')){
+      containerRef.current?.addEventListener('mouseover', handleMouseOver)
+      containerRef.current?.classList.add('hovered');
+      
+      containerRef.current?.addEventListener('mouseleave', handleMouseOutMain)
+      setTimeout(() => {
+        containerRef.current?.querySelector('ul')?.addEventListener('mouseover', handleMouseOverChild)
+        containerRef.current?.querySelector('ul')?.addEventListener('mouseleave', handleMouseOutChild)
+      }, 200);
+    }
+    setDropdownOpen(state => true)
+  }, []);
+
+  const closeDropdown = useCallback(() => {
+    containerRef.current?.classList.remove('hovered');
+    rootMenuRef.current?.classList.remove('hovered');
+    setDropdownOpen(false)
+    setDropdownMainClose(false);
+    setDropdownChildClose(false);
+  }, []);
 
   const childrenProps = useMemo(() => {
     return {
       isOpen: dropdownIsOpen,
       onClick: toggleDropdown,
+      onHover: toggleDropdown
     };
   }, [dropdownIsOpen, toggleDropdown]);
 
@@ -96,7 +139,11 @@ export const Dropdown = <TValue,>({
     };
   }, [dropdownIsOpen]);
 
-  const rootMenuRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    if (dropdownMainClose && dropdownChildClose) {
+      closeDropdown();
+    }
+  }, [dropdownMainClose,dropdownChildClose]);
 
   useLayoutEffect(() => {
     if (dropdownIsOpen && rootMenuRef.current) {
@@ -113,15 +160,17 @@ export const Dropdown = <TValue,>({
     <div className={clsx('rnd', className)} ref={containerRef}>
       {children(childrenProps)}
       {dropdownIsOpen && (
-        <ul
-          className={`rnd__root-menu rnd__menu ${menuPositionClassName}`}
-          style={{ width: containerWidth }}
-          ref={rootMenuRef}
-        >
-          {items.map((item, index) => (
-            <Option key={index} option={item} onSelect={handleSelect} renderOption={renderOption} />
-          ))}
-        </ul>
+        <div className='rnd-overlay'>
+          <ul
+            className={`rnd__root-menu rnd__menu ${menuPositionClassName}`}
+            style={{ width: containerWidth }}
+            ref={rootMenuRef}
+          >
+            {items.map((item, index) => (
+              <Option key={index} option={item} onSelect={handleSelect} renderOption={renderOption} />
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

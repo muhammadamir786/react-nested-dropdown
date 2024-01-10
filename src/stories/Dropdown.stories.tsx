@@ -9,8 +9,8 @@ export default {
   title: 'Dropdown',
   component: Dropdown,
   args: {
-    children: ({ isOpen, onClick }) => (
-      <button type="button" onClick={onClick}>
+    children: ({ isOpen, onClick, onHover }) => (
+      <button type="button" onClick={onClick} onMouseOver={onHover}>
         {isOpen ? 'Close dropdown' : 'Open dropdown'}
       </button>
     ),
@@ -68,6 +68,18 @@ WithSubmenu.args = {
             {
               label: 'Option 2.1.1',
               onSelect: () => action('option:onSelect')('Option 2.1.1 clicked'),
+              items: [
+                {
+                  label: 'Option 2.1.1.0',
+                  onSelect: () => action('option:onSelect')('Option 2.1.1 clicked'),
+                  items: [
+                    {
+                      label: 'Option 2.1.1.0.0',
+                      onSelect: () => action('option:onSelect')('Option 2.1.1 clicked'),
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
